@@ -1,5 +1,5 @@
-var apikey = "167bd3889ca618ceeb77581e5e7fa5091a6baed87d3d9b290d09cd2c8adadedb";
-var clientkey = "f2c9c6289d0b4af55423947670269e2861c3905b5f7b324e059291da05992ffe";
+var apikey = "niftyappkey";
+var clientkey = "niftyclikey";
 var ncmb = new NCMB(apikey, clientkey);
 var recipepageTable = ncmb.DataStore("recipepage");
 var materialTable = ncmb.DataStore("material");
@@ -202,8 +202,8 @@ var logins = 0;
 
 // 楽天API用パラメータ
 var api = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20140222';
-var applicationId = '1082180769499351274';
-var affiliateId = '1552aa63.ee805cfa.1552aa64.2249d1ac';
+var applicationId = 'rakutenappkey';
+var affiliateId = 'rakutenclikey';
 // 検索キーワード
 var keyword = '避難食'; //URLEncode:%E9%81%BF%E9%9B%A3%E9%A3%9F
 // 一度に読み込む件数
@@ -965,7 +965,7 @@ var okinirecipeID = [];
 var okinicount = 0;
 var okinipicture = [];
 var okinititel = [];
-var ncmb = new NCMB("167bd3889ca618ceeb77581e5e7fa5091a6baed87d3d9b290d09cd2c8adadedb", "f2c9c6289d0b4af55423947670269e2861c3905b5f7b324e059291da05992ffe");
+var ncmb = new NCMB("niftyappkey", "niftyclikey");
 
 function mypage() {
   var mypage = ncmb.DataStore("mypage");
@@ -1038,8 +1038,8 @@ function mypage() {
 function toukou() {
   //レシピ投稿
   var recipeIDnew;
-  var apikey = "167bd3889ca618ceeb77581e5e7fa5091a6baed87d3d9b290d09cd2c8adadedb";
-  var clientkey = "f2c9c6289d0b4af55423947670269e2861c3905b5f7b324e059291da05992ffe";
+  var apikey = "niftyappkey";
+  var clientkey = "niftyclikey";
   var ncmb = new NCMB(apikey, clientkey);
   var recipepage = ncmb.DataStore("recipepage");
   recipepage.order("recipeID", true)
