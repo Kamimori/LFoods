@@ -1,0 +1,1253 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <script src="components/loader.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="lib/angular/angular.min.js"></script>
+  <script src="lib/onsenui/js/onsenui.min.js"></script>
+  <script src="lib/onsenui/js/angular-onsenui.min.js"></script>
+  <script src="scriptsfile/top_script.js"></script>
+  <script src="scriptsfile/infomation.js"></script>
+  <script src="scriptsfile/child.js"></script>
+  <script src="scriptsfile/newpage.js"></script>
+  <script src="scriptsfile/login.js"></script>
+  <link rel="stylesheet" href="components/loader.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <!--ページ遷移-->
+  <ons-navigator page="top.html" var="myNav"></ons-navigator>
+  <!--メニュー画面-->
+  <ons-template id="menu.html">
+    <ons-page ng-controller="MenuController">
+      <ons-toolbar class="toolall">
+        <div class="left" style="line-height: 44px">
+          <ons-back-button>戻る</ons-back-button>
+        </div>
+        <div class="center">メニュー</div>
+      </ons-toolbar>
+      <ons-list class="menu-list">
+        <ons-list-item ng-if="logins!=2" class="menu-item" ng-click="myNav.pushPage('toukou.html')">
+          <ons-icon icon="ion-edit" size="20px"></ons-icon>
+          <label id="menu_label">投稿</label>
+        </ons-list-item>
+        <ons-list-item ng-if="logins!=1" class="menu-item" ng-click="myNav.pushPage('login.html')">
+          <ons-icon icon="ion-home" size="20px"></ons-icon>
+          <label id="menu_label">ログイン</label>
+        </ons-list-item>
+        <ons-list-item ng-if="logins!=2" class="menu-item" onclick="mypage()">
+          <ons-icon icon="ion-ios-person" size="20px"></ons-icon>
+          <label id="menu_label">マイページ</label>
+        </ons-list-item>
+        <ons-list-item class="menu-item" ng-click="myNav.pushPage('shop.html')">
+          <ons-icon icon="ion-ios-search-strong" size="20px"></ons-icon>
+          <label id="menu_label">商品購入</label>
+        </ons-list-item>
+        <ons-list-item class="menu-item" ng-click="myNav.pushPage('katego.html')">
+          <ons-icon icon="fa-book" size="20px"></ons-icon>
+          <label id="menu_label">カテゴリ</label>
+        </ons-list-item>
+        <ons-list-item class="menu-item" ng-click="myNav.pushPage('page2.html')">
+          <ons-icon icon="fa-circle" size="20px"></ons-icon>
+          <label id="menu_label">新着一覧</label>
+        </ons-list-item>
+        <ons-list-item class="menu-item" ng-click="myNav.pushPage('saigai.html')">
+          <ons-icon icon="fa-info-circle" size="20px"></ons-icon>
+          <label id="menu_label">災害知識</label>
+        </ons-list-item>
+        <ons-list-item class="menu-item" ng-click="myNav.pushPage('setting.html')">
+          <ons-icon icon="cog" size="20px"></ons-icon>
+          <label id="menu_label">設定</label>
+        </ons-list-item>
+        <ons-list-item ng-if="logins!=2" class="menu-item" onclick="logout()">
+          <label id="menu_label">ログアウト</label>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+
+  <!--設定-->
+  <ons-template id="setting.html">
+    <ons-toolbar class="toolall">
+      <div class="left" style="line-height: 44px">
+        <ons-back-button>戻る</ons-back-button>
+      </div>
+      <div class="center">設定</div>
+    </ons-toolbar>
+    <ons-page>
+      <div class="setting">
+        <label class="setting_name">通知</label>
+        <ons-switch class="setting_swich"></ons-switch>
+      </div>
+    </ons-page>
+  </ons-template>
+
+  <!--トップページ-->
+  <ons-template id="top.html">
+    <ons-page ng-controller="TopController as top">
+      <ons-toolbar class="toolall">
+        <div class="left">
+          <ons-toolbar-button ng-click="myNav.pushPage('menu.html',{animation:'lift'})">
+            <ons-icon icon="md-menu"></ons-icon>
+          </ons-toolbar-button>
+        </div>
+        <div class="center">LFoods</div>
+        <div class="right">
+        </div>
+      </ons-toolbar>
+
+      <div class="content">
+        <div class="search_class">
+          <form ng-submit="top.changeSearch()">
+            <input type="search" class="search-input" ng-model="searchText" placeholder="レシピ名"></input>
+          </form>
+        </div>
+        <div class="top_titlepict">
+          <ons-carousel var="cookcal" style="width:100%; height:250px;" swipeable auto-scroll overscrollable>
+            <ons-carousel-item ng-repeat="item in new_recipe track by $index" id="{{item.recipeID}}" onclick="page1(this)">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.titlepicture}}" id="cookpic" width="340px" height="250px">
+              <div class="top_sideinfo">
+                <label class="top_username">{{item.userId}}</label>
+                <br>
+                <label class="top_cookname">{{item.title}}</label>
+              </div>
+            </ons-carousel-item>
+          </ons-carousel>
+          <ons-icon icon="fa-arrow-circle-right" size="50px" class="arrowright" ng-click="cookcal.next()"></ons-icon>
+          <ons-icon icon="fa-arrow-circle-left" size="50px" class="arrowleft" ng-click="cookcal.prev()"></ons-icon>
+        </div>
+
+        <div class="category">
+          <ons-carousel item-width="120px" swipeable auto-scroll>
+            <ons-carousel-item>
+              <ons-button modifier="quiet" ng-click="top.changePage('shop.html')">商品購入</ons-button>
+            </ons-carousel-item>
+            <ons-carousel-item>
+              <ons-button modifier="quiet" ng-click="top.changePage('katego.html')">カテゴリ</ons-button>
+            </ons-carousel-item>
+            <ons-carousel-item>
+              <ons-button modifier="quiet" ng-click="top.changePage('page2.html')">新着一覧</ons-button>
+            </ons-carousel-item>
+            <ons-carousel-item>
+              <ons-button modifier="quiet" ng-click="top.changePage('saigai.html')">災害知識</ons-button>
+            </ons-carousel-item>
+          </ons-carousel>
+        </div>
+
+        <p class="pop_subtitle">人気レシピ</p>
+        <div class="pop_recipes">
+          <ons-carousel style="width:100%; height:100px;" swipeable overscrollable item-width="140px">
+            <ons-carousel-item ng-repeat="item in pop_recipe track by $index" id="{{item.recipeID}}" onclick="page1(this)">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.titlepicture}}" width="120px" height="80px">
+              <div class="pop_sideinfo">
+                <label class="pop_cookname">{{item.title}}</label>
+                <br>
+                <label class="pop_username">{{item.userId}}</label>
+              </div>
+            </ons-carousel-item>
+          </ons-carousel>
+        </div>
+
+        <p class="new_subtitle">新着レシピ</p>
+        <div class="new_recipes">
+          <ons-carousel style="width:100%; height:100px;" swipeable overscrollable item-width="140px">
+            <ons-carousel-item ng-repeat="item in new_recipe track by $index" id="{{item.recipeID}}" onclick="page1(this)">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.titlepicture}}" width="120px" height="80px">
+              <div class="new_sideinfo">
+                <label class="new_cookname">{{item.title}}</label>
+                <br>
+                <label class="new_username">{{item.userId}}</label>
+              </div>
+            </ons-carousel-item>
+          </ons-carousel>
+        </div>
+
+        <!--災害知識-->
+        <p class="info_subtitle">災害時のプチ知識</p>
+        <div class="infomation_page">
+          <ul class="trivia">
+            <li>地震被害死者の割合
+              <ul>
+                <li>地震被害死者の８０％以上が家屋や家具での圧死です。</li>
+              </ul>
+            </li>
+            <li>大災害後の復旧
+              <ul>
+                <li>大災害後の復旧は、電話や電気が比較的早く、水道、特にガスは長期間を要します。したがって電気ナベを一つ保有していると重宝します。</li>
+              </ul>
+            </li>
+            <li>着衣に火が
+              <ul>
+                <li>着衣に火がついたとき走っては風で火勢が強くなるのでいけません。止まって」「寝て」「転がって」消します。</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="info_add"><a ng-href="http://bousai-chishiki.com/category/disasters-information/">もっと詳しく</a></div>
+        </div>
+
+        <!--今月の食材：<label class="weekname">缶詰の魚</label>-->
+        <p class="week_subtitle">テーマレシピ</p>
+        <div class="week_recipes">
+          <ons-list modifier="tappable" class="week_list">
+            <ons-list-header style="background-color:#f3f3f2;">今月のテーマ:
+              <label class="week_material">{{top.materialName}}</label>
+            </ons-list-header>
+            <ons-list-item ng-repeat="item in week_recipe track by $index" class="week_list_item" id="{{item.recipeID}}" onclick="page1(this)">
+              <ons-row>
+                <ons-col width="120px">
+                  <div class="week_pict">
+                    <!--<a ng-href="{{week.affiliateUrl}}" target="_blank">-->
+                    <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.titlepicture}}" width="120px" height="80px">
+                    <!--</a>-->
+                  </div>
+                </ons-col>
+                <ons-col>
+                  <div class="week_sideinfo">
+                    <label class="week_cookname">{{item.title}}</label>
+                    <br>
+                    <br>
+                    <label class="week_username">{{item.userId}}</label>
+                  </div>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+            <ons-button modifier="large" class="weekbtn" ng-click="top.changePage('week.html')">もっと見る</ons-button>
+          </ons-list>
+        </div>
+      </div>
+    </ons-page>
+  </ons-template>
+
+  <!--テーマレシピページ-->
+  <ons-template id="week.html">
+    <ons-page ng-controller="WeekController as week">
+      <ons-toolbar class="toolall">
+        <div class="left" style="line-height:44px">
+          <ons-back-button>戻る</ons-back-button>
+        </div>
+        <div class="center">テーマレシピ</div>
+      </ons-toolbar>
+      <ons-list modifier="tappable" class="week_list">
+        <ons-list-item ng-repeat="item in week_recipe track by $index" class="week_list_item" id="{{item.recipeID}}" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="120px">
+              <div class="week_pict">
+                <!--<a ng-href="{{week.affiliateUrl}}" target="_blank">-->
+                <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.titlepicture}}" width="120px" height="80px">
+                <!--</a>-->
+              </div>
+            </ons-col>
+            <ons-col>
+              <div class="week_sideinfo">
+                <label class="week_cookname">{{item.title}}</label>
+                <br>
+                <br>
+                <label class="week_username">{{item.userId}}</label>
+              </div>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <!--広告ページ-->
+  <ons-template id="shop.html">
+    <ons-page ng-controller="ShopCtrl as shop" id="ng-app">
+      <div id="loader-bg">
+        <div id="loader">
+          <ons-progress-circular indeterminate></ons-progress-circular>
+        </div>
+      </div>
+      <ons-toolbar class="toolall">
+        <div class="left" style="line-height: 44px">
+          <ons-back-button>戻る</ons-back-button>
+        </div>
+        <div class="center">商品購入</div>
+      </ons-toolbar>
+      <div class="select_class">
+        <select class="shop_select" ng-model="shop.shop_category" ng-options="c.name for c in shop_categorys" ng-change="shop.selectChange()" size="1">
+        </select>
+      </div>
+      <div id="wrap">
+        <div class="container" ng-cloak>
+          <ons-list class="row" modifier="inset">
+            <ons-list-item ng-repeat="item in items" class="list-items">
+              <ons-row>
+                <ons-col width="128px">
+                  <div class="shopimg">
+                    <a ng-href="{{item.affiliateUrl}}" target="_blank">
+                      <ons-progress-circular indeterminate ng-hide="shop.loading"></ons-progress-circular>
+                      <img ng-src="{{item.mediumImageUrls[0]}}" ng-hide="shop.shopload" class="shoppict">
+                    </a>
+                  </div>
+                </ons-col>
+                <ons-col>
+                  <div class="shopping">
+                    <div class="capation">
+                      <span class="shopname">{{item.shopName}}</span>
+                    </div>
+                    <div class="caption2">
+                      <!--<a ng-href="{{item.affiliateUrl}}">-->
+                      <span class="shopitem">{{item.itemName}}</span>
+                      <!--</a>-->
+                    </div>
+                    <div class="caption3">
+                      <span class="reviewaverage">レビュー平均: {{item.reviewAverage}}</span>
+                    </div>
+                    <div class="caption4">
+                      <span class="price">{{item.itemPrice}}円</span>
+                    </div>
+                  </div>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+          </ons-list>
+          <div class="pagination" style="margin-bottom:1em; text-align:center;" ng-cloak>
+            <ons-button modifier="quiet" ng-click="shop.Pagination(0)">前へ</ons-button>
+            <span style="font-color:gray; font-size:12px;">{{shop.currentPage}}ページ目</span>
+            <ons-button modifier="quiet" ng-click="shop.Pagination(1)">次へ</ons-button>
+          </div>
+        </div>
+      </div>
+    </ons-page>
+  </ons-template>
+
+  <!--検索結果ページ-->
+  <ons-template id="search.html">
+    <ons-page ng-controller="searchController as search">
+      <ons-toolbar class="toolall">
+        <div class="left" style="line-height:44px">
+          <ons-back-button>戻る</ons-back-button>
+        </div>
+        <div class="center">検索結果</div>
+      </ons-toolbar>
+      <ons-list modifier="tappable" class="week_list">
+        <ons-list-item ng-repeat="item in search_recipe track by $index" class="week_list_item">
+          <ons-row>
+            <ons-col width="120px">
+              <div class="week_pict">
+                <!--<a ng-href="{{week.affiliateUrl}}" target="_blank">-->
+                <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.titlepicture}}" width="120px" height="80px">
+                <!--</a>-->
+              </div>
+            </ons-col>
+            <ons-col>
+              <div class="week_sideinfo">
+                <label class="week_cookname">{{item.title}}</label>
+                <br>
+                <br>
+                <label class="week_username">{{item.userId}}</label>
+              </div>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="login.html">
+    <ons-page class="page">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">
+          ログイン
+        </div>
+      </ons-toolbar>
+      <div class="logo">
+        <h1 class="h1_logo">LFoodsにログイン</h1>
+        <div class="input_username">
+          <p>
+            <input placeholder=" Username" id="user_idBox2" class="text-input text-inputback">
+          </p>
+        </div>
+        <div class="input_password">
+          <p>
+            <input type="password" placeholder=" Password" id="passwordBox2" class="text-input text-inputback">
+          </p>
+        </div>
+        <p>
+          <ons-button modifier="material" onclick="login2()" class="login_btn">ログイン</ons-button>
+        </p>
+        <p>
+          <ons-button modifier="material" ng-click="myNav.pushPage('signup.html')" class="newacc_btn">新規登録</ons-button>
+        </p>
+      </div>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="signup.html">
+    <ons-page class="page">
+      <ons-toolbar class="toolbar">
+        <div class="right">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">
+          新規登録
+        </div>
+      </ons-toolbar>
+      <div class="logo">
+        <p>
+          <input placeholder="UserId" id="user_nameBox1" class="text-input text-inputback">
+        </p>
+        <p>
+          <input placeholder="Username" id="user_idBox1" class="text-input text-inputback">
+        </p>
+
+        <p>
+          <input type="password" placeholder="Password" id="passwordBox1" class="text-input text-inputback">
+        </p>
+
+        <p>
+          <ons-button modifier="large" onclick="login1()">新規登録</ons-button>
+        </p>
+      </div>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="page2.html">
+    <ons-page class="page">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">新着一覧</div>
+      </ons-toolbar>
+
+      <ons-list class="newpage1" ng-controller="MyCtrl6">
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col>
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thuma"></img>
+            </ons-col>
+          </ons-row>
+          <ons-row>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <br>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <ons-row>
+                <div class="containera">
+                  <p class="item-desc">{{ item.desc }}</p>
+                </div>
+              </ons-row>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+
+      <ons-list class="newpage2" ng-controller="MyCtrl7">
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col>
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thuma"></img>
+            </ons-col>
+          </ons-row>
+          <ons-row>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <br>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.6;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <ons-row>
+                <div class="containera">
+                  <p class="item-desc">{{ item.desc }}</p>
+                </div>
+              </ons-row>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+
+
+  <ons-template id="katego.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">カテゴリのページ</div>
+      </ons-toolbar>
+      <ons-scroller>
+        <ons-list>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('kann.html');"><img src="images/kanpan.jpg" width="25" height="25" align="left">
+            <p>乾パン</p>
+          </ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('menn.html');"><img src="images/noodle.jpg" width="25" height="25" align="left">
+            <p>麺類</p>
+          </ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('kanndume.html');"><img src="images/kandume.jpg" width="25" height="25" align="left">
+            <p>缶詰</p>
+          </ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('reto.html');"><img src="images/retoruto.jpg" width="25" height="25" align="left">
+            <p>レトルト食品</p>
+          </ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('siriaru.html');"><img src="images/serial.jpg" width="25" height="25" align="left">
+            <p>シリアル</p>
+          </ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('sonota.html');">
+            <p>その他</p>
+          </ons-list-item>
+        </ons-list>
+      </ons-scroller>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="kann.html">
+    <ons-page ng-controller="MyCtrl0">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">乾パン</div>
+      </ons-toolbar>
+
+      <ons-list>
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" class="item" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="80px">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thum"></img>
+            </ons-col>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <p class="item-desc">{{ item.desc }}</p>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="menn.html">
+    <ons-page ng-controller="MyCtrl1">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">麺類</div>
+      </ons-toolbar>
+      <ons-list>
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" class="item" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="80px">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thum"></img>
+            </ons-col>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <p class="item-desc">{{ item.desc }}</p>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="kanndume.html">
+    <ons-page ng-controller="MyCtrl2">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">缶詰</div>
+      </ons-toolbar>
+
+      <ons-list>
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" class="item" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="80px">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thum"></img>
+            </ons-col>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <p class="item-desc">{{ item.desc }}</p>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="reto.html">
+    <ons-page ng-controller="MyCtrl3">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">レトルト食品</div>
+      </ons-toolbar>
+
+      <ons-list>
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" class="item" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="80px">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thum"></img>
+            </ons-col>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <p class="item-desc">{{ item.desc }}</p>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+
+  <ons-template id="siriaru.html">
+    <ons-page ng-controller="MyCtrl4">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">シリアル</div>
+      </ons-toolbar>
+
+      <ons-list>
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" class="item" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="80px">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thum"></img>
+            </ons-col>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <p class="item-desc">{{ item.desc }}</p>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="sonota.html">
+    <ons-page ng-controller="MyCtrl5">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">その他</div>
+      </ons-toolbar>
+
+      <ons-list>
+        <ons-list-item id="{{item.recipe}}" modifier="tappable" class="item" ons-lazy-repeat="MyDelegate" onclick="page1(this)">
+          <ons-row>
+            <ons-col width="80px">
+              <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{item.rand}}" class="item-thum"></img>
+            </ons-col>
+            <ons-col>
+              <header>
+                <span class="item-title">{{item.title}}</span>
+                <span class="item-label">{{item.label}}</span>
+              </header>
+              <div ng-show="item.desc==''">
+                <p><span style='opacity: 0.7;'><ons-icon icon='fa-spinner' spin='true'></ons-icon> Loading bacon...</p></span></div>
+              <p class="item-desc">{{ item.desc }}</p>
+            </ons-col>
+          </ons-row>
+        </ons-list-item>
+      </ons-list>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="mypege.html">
+    <ons-page class="page" ng-controller="mypage">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">
+          マイページ
+        </div>
+      </ons-toolbar>
+      <div>
+      </div>
+      <div>
+        <p id="name" style="font-size:30px;">{{name}}</p>
+      </div>
+      <div>
+        <ons-button class="button1" modifier="light" onclick="myNav.pushPage('profile.html', { animation : 'slide' } )">
+          プロフィール設定
+        </ons-button>
+      </div>
+      </div>
+      <div class="introduce">
+        <p style="font-size:20px;">{{profile}}</p>
+      </div>
+      <div class="nav">
+        <ul class="nl">
+          <li><a href="#" class="rec" onclick="ChangeTab('rec'); return false;">レシピ</a></li>
+          <li><a href="#" class="fav" onclick="ChangeTab('fav'); return false;">お気に入り</a></li>
+        </ul>
+      </div>
+      <div id="rec" class="tab">
+        <ons-list-item id="{{recipeID[$index]}}" ng-repeat="item in title track by $index" id="{{item.recipeID}}" onclick="page1(this)"><img src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{picture[$index]}}" width="100" height="100" align="left">{{item}}</ons-list-item>
+      </div>
+      <div id="fav" class="tab">
+        <ons-list-item id="{{recipeID1[$index]}}" ng-repeat="item in title1 track by $index" id="{{item.recipeID}}" onclick="page1(this)"><img src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/{{picture1[$index]}}" width="100" height="100" align="left">{{item}}</ons-list-item>
+      </div>
+      <script type="text/javascript">
+        // デフォルトのタブを選択
+        ChangeTab('rec');
+      </script>
+    </ons-page>
+    </ons-navigator>
+  </ons-template>
+
+  <ons-template id="profile.html">
+    <ons-page class="page">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">プロフィール設定</div>
+      </ons-toolbar>
+      <ons-button class="button3">
+        <div class="nickname" onclick="myNav.pushPage('nickname.html', { animation : 'slide' } )">ニックネーム</div>
+      </ons-button>
+      <ons-button class="button4">
+        <div class="myintroduce" onclick="myNav.pushPage('jikosyoukai.html', { animation : 'slide' } )">自己紹介</div>
+      </ons-button>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="nickname.html">
+    <ons-page class="page">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">ニックネーム</div>
+      </ons-toolbar>
+      <form name="nameform">
+        <textarea class="textarea" id="my1-textarea" required></textarea>
+        <ons-button modifier="large" ng-disabled="nameform.$invalid" onclick="namesave()">保存</ons-button>
+      </form>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="jikosyoukai.html">
+    <ons-page class="page">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">自己紹介</div>
+      </ons-toolbar>
+      <form name="zikoform">
+        <textarea class="textarea" id="my2-textarea" required></textarea>
+        <ons-button modifier="large" ng-disabled="zikoform.$invalid" onclick="profilesave()">保存</ons-button>
+      </form>
+    </ons-page>
+    </ons-navigator>
+  </ons-template>
+
+
+
+  <ons-template id="toukou.html">
+    <ons-page class="page" ng-controller="toukou">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center toolbartop">投稿</div>
+      </ons-toolbar>
+    
+      <ons-scroller>
+      
+        <form novalidate name="myForm">
+          <ons-list>
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="90px">
+                  <span style="color: #666">タイトル</span></ons-col>
+                <ons-col>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <p>
+                    <textarea id="titlea" class="textarea" type="text" name="titele" ng-model="title.name" required ng-maxlength="20">
+                    </textarea>
+                    <p ng-show="myForm.title.$error.required">入力してください</p>
+                    <p ng-show="myForm.title.$error.maxlength">長すぎます</p>
+                  </p>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="90px">
+                  <span style="color: #666">トップ画像</span></ons-col>
+                <ons-col>
+              </ons-row>
+            </ons-list-item>
+            <ons-list-item>
+              <ons-row>
+                <ons-col>
+                  <ons-button id="take-pict">トップ画像投稿</ons-button>
+                  <ons-button id="form-send">送信</ons-button>
+                  <img id="get-pict" />
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="90px">
+                  <span style="color: #666">作り方</span></ons-col>
+                <ons-col>
+              </ons-row>
+            </ons-list-item>
+            <div ng-repeat="tuku in tukus">
+              <ons-list-item>
+                <ons-row align="center">
+                  <span name="tukurikata">{{$index+1}}</span>
+                  <textarea class="textarea tukurikata1" id="tukuri{{$index}}" type="text" name="tukuri{{$index}}" ng-model="tukuri.name" required ng-maxlength="50"></textarea>
+                  <p ng-show="myForm.tukuri{{$index}}.$error.required">入力してください</p>
+                  <p ng-show="myForm.tukuri{{$index}}.$error.maxlength">長すぎます</p>
+                </ons-row>
+                <ons-button id="take-pict{{$index}}" name="{{$index}}" onclick="gazou(this)">作り方画像</ons-button>
+                <img id="get-pict{{$index}}" />
+                <ons-button id="form-send{{$index}}">送信</ons-button>
+              </ons-list-item>
+            </div>
+
+            <ons-list-item>
+              <ons-col>
+                <p>
+                  <ons-button ng-click="tukus.push({})" modifier="large--cta">
+                    追加
+                  </ons-button>
+                </p>
+                <div>
+                  <ons-button ng-click="tukus.splice($index, 1)" modifier="large--cta">
+                    削除
+                  </ons-button>
+                </div>
+              </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="200px">
+                  <span style="color: #666">人数</span></ons-col>
+                <ons-col>
+
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <select id="u_form3">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <div style="line-height: 22px">材料・分量</div>
+                  <div ng-repeat="color in colors">
+                    <div style="width: 50%; float: left;">
+                      <ons-list>
+                        <ons-list-item>
+                          <input type="text" placeholder="材料" ng-model="color.name" class="text-input text-input--transparent zairyou1" style="margin-top:8px;">
+                        </ons-list-item>
+                      </ons-list>
+                    </div>
+                    <div id="zai0">
+                      <ons-list>
+                        <ons-list-item>
+                          <input type="text" placeholder="分量" ng-model="color1.name" class="text-input text-input--transparent bunnryou1" style="margin-top:8px;">
+                        </ons-list-item>
+                      </ons-list>
+                    </div>
+                  </div>
+                  <ons-col>
+                    <div class="center">
+                      <p>
+                        <ons-button ng-click="colors.push({})" modifier="large--cta">材料を追加</ons-button>
+                      </p>
+                    </div>
+                    <div class="center">
+                      <p>
+                        <ons-button ng-click="colors.splice($index, 1)" modifier="large--cta">削除</ons-button>
+                      </p>
+                    </div>
+                  </ons-col>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="200px">
+                  <span style="color: #666">レシピの紹介文</span></ons-col>
+                <ons-col>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <textarea class="textarea" id="syoukai1" type="text" name="syoukai" ng-model="syoukai.name" required ng-maxlength="50"></textarea>
+                  <p ng-show="myForm.syoukai.$error.required">入力してください</p>
+                  <p ng-show="myForm.syoukai.$error.maxlength">長すぎます</p>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="200px">
+                  <span style="color: #666">レシピの生い立ち</span></ons-col>
+                <ons-col>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <textarea class="textarea" id="oitati1" type="text" name="oitati" ng-model="oitati.name" required ng-maxlength="50"></textarea>
+                  <p ng-show="myForm.oitati.$error.required">入力してください</p>
+                  <p ng-show="myForm.oitati.$error.maxlength">長すぎます</p>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="200px">
+                  <span style="color: #666">コツ・ポイント</span></ons-col>
+                <ons-col>
+
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <textarea class="textarea" id="kotu1" type="text" name="kotu" ng-model="kotu.name" required ng-maxlength="50"></textarea>
+                  <p ng-show="myForm.kotu.$error.required">入力してください</p>
+                  <p ng-show="myForm.kotu.$error.maxlength">長すぎます</p>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col width="200px">
+                  <span style="color: #666">カテゴリー</span></ons-col>
+                <ons-col>
+
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+            <ons-list-item>
+              <ons-row align="center">
+                <ons-col>
+                  <select id="u_form2">
+                    <option value="5">その他</option>
+                    <option value="0">乾パン</option>
+                    <option value="1">麺類</option>
+                    <option value="2">缶詰</option>
+                    <option value="3">レトルト食品</option>
+                    <option value="4">シリアル</option>
+                  </select>
+                </ons-col>
+              </ons-row>
+            </ons-list-item>
+
+      </ons-scroller>
+      </ons-list>
+      <ons-list-item>
+        <ons-tabbar>
+          <ons-tab>
+            <ons-button class="center" style="width:60%" ng-disabled="myForm.$invalid" id="button6" onclick="toukou()">
+              投稿
+            </ons-button>
+          </ons-tab>
+        </ons-tabbar>
+      </ons-list-item>
+      </form>
+
+    </ons-page>
+    </ons-navigator>
+  </ons-template>
+  <!--災害知識ページ-->
+  <ons-template id="saigai.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">災害時の知識</div>
+      </ons-toolbar>
+      <ons-scroller>
+        <ons-list>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('mame1.html');">　　ドア枠の下は危険！</p>
+          </ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('mame2.html');">　　少ない水でもご飯を炊く方法</ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('mame3.html');">　　ナイフがなくても簡単に切れる</ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('mame4.html');">　　災害伝言ダイヤル</ons-list-item>
+          <ons-list-item modifier="tappable" ng-click="myNav.pushPage('mame5.html');">　　机の下は危ない！</ons-list-item>
+        </ons-list>
+      </ons-scroller>
+    </ons-page>
+  </ons-template>
+  <ons-template id="mame1.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">ドア枠の下は危険！</div>
+      </ons-toolbar>
+      <div style="text-align:center">
+        <br><font size="10px" color="red">ドア枠の下は危険！</font>
+        <br>
+        <br>
+        <img src="images/mametisiki1.jpg" align="center">
+        <br>
+        <br>
+      </div>
+      <div style="margin:0px 10px 0px 10px">
+        <font size="5px">ドアを開け、ドア枠の下に立って様子をうかがう人が多いが、これは大変危険な場所です。ドア枠は構造上弱い場所で倒壊すると上からつぶされます。横に倒壊すると二つに体が裁断される事になります。</font>
+      </div>
+  </ons-template>
+  <ons-template id="mame2.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">少ない水でもご飯を炊く方法</div>
+      </ons-toolbar>
+      <div style="text-align:center">
+        <font size="10px" color="blue">少ない水でもご飯を炊く方法</font>
+        <br>
+        <br>
+        <img src="images/mametisiki2.jpg" 　width="100%">
+      </div>
+      <div style="margin:0px 10px 0px 10px">
+        <br>
+        <font size="5px">沸騰させるためのお水だったら、川の水でも雨水でもOK
+ジップ袋で炊いたごはんは食器に移してもいいが、袋からそのまま食べてもいい。そうすれば無駄な食器を使わなくて済む</font>
+      </div>
+  </ons-template>
+  <ons-template id="mame3.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">ナイフがなくても簡単に切れる</div>
+      </ons-toolbar>
+      <div style="text-align:center">
+        <font size="10" color="silver">ナイフがなくても切れる</font>
+        <img src="images/mametisiki3.jpg">
+      </div>
+      <div style="margin:0px 10px 0px 10px">
+        <br>
+        <font size="5px">床に置いて両足で押さえる。印が真ん中にあることを確認し、ヒモの余った部分を印の下に潜らせて、ぴんと張るまで引っ張り上げるロープとロープをこすり合わせ、摩擦の力で少しずつ切っていくナイロンのロープやヒモだとうまく行くが、他の材質でも太すぎなければ可能です</font>
+      </div>
+  </ons-template>
+  <ons-template id="mame4.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">災害伝言ダイヤル</div>
+      </ons-toolbar>
+
+      <div style="text-align:center">
+        <br><font size="10px">災害伝言ダイヤル</font>
+        <br>
+        <br>
+        <img src="images/mametisiki5.jpg">
+      </div>
+      <div style="margin:0px 10px 0px 10px">
+        <font size="5px">「災害伝言ダイヤル」は「１７１」です。毎月始めの1日には体験ができるので「１７１」を押してみましょう。　災害時に電話が不通ではないものの通じ難い時、公衆電話は通じ易いです。停電ではテレホンカードが使えません。小銭を準備しておきましょう。</font>
+      </div>
+  </ons-template>
+  <ons-template id="mame5.html">
+    <ons-page>
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div class="center">机の下は危ない！</div>
+      </ons-toolbar>
+
+      <div style="text-align:center">
+        <br><font size="10px" color="red">机の下は危ない！</font>
+        <br>
+        <br>
+        <img src="images/mametisiki6.jpg">
+      </div>
+      <div style="margin:0px 10px 0px 10px">
+        <font size="5px">「グラッときたら机の下」は適切ではありません。大きな部屋の机の下より、一般的には「玄関」が安全ゾーンです。玄関には比較的狭いので丈夫であり、飛んでくる大型家具もなく、靴があり、逃げ出し口そのものです。</font>
+      </div>
+  </ons-template>
+
+  <!--レシピページ -->
+  <ons-template id="about.html">
+    <ons-page id="about" ng-controller="detailController">
+      <ons-toolbar class="toolbar">
+        <div class="left">
+          <ons-back-button class="toolbartop">戻る</ons-back-button>
+        </div>
+        <div id="msg" class="center toolbartop">
+
+        </div>
+      </ons-toolbar>
+      <div id="sya" class="about_all">
+        <div id="gazou "><img id="image1" src="" class="item-thum1"></img>
+        </div>
+        <div style="width:100%;">
+          <ons-button class="about_goodbtn" ng-if="logins!=2" id="">いいね♡</ons-button>
+          <ons-button class="about_savebtn" ng-if="logins!=2" id="akaza" onclick="okimiiri()">レシピを保存</ons-button>
+        </div>
+        <div class="about_info">
+          <p id="monzi"></p>
+        </div>
+
+        <div style="width:100%;">
+          <ons-button class="about_favobtn" id="user1">お気に入り</ons-button>
+          <ons-button modifier="quiet" disabled="true" style="width:40%;margin:5%;" id="">
+            <i class="fa fa-star" aria-hidden="true ">100</i>
+          </ons-button>
+        </div>
+        <span style="width:100%;min-width:100%;">
+		  <div style="width:50%;float:left;">
+		    <ons-list id="zairyou1"></ons-list>
+		  </div> 
+		  <ons-list id="ryou1"></ons-list>
+		</span>
+
+        <div id="listtukurikata">
+          <span style="width:100%;">
+		    <div>
+			  <div class="about_header"><ons-list-header>作り方</ons-list-header></div>
+			    <ons-list>
+			      <ons-list-item class="itemo">
+			        <ons-row>
+					  <ons-col width="10%"><p>1</p></ons-col> 
+					  <ons-col width="60%" class="about_makerecipe">
+                        <span><p></p></span>
+                      </ons-col>
+                      <ons-col width="30%">
+                        <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/05d7bae0b37f79563dce0667e4664495.jpg" class="item-thum2"></img>
+                      </ons-col>
+                    </ons-row>
+                  </ons-list-item>
+                </ons-list>
+            </div>
+          </span>
+        <span style="width:100%;">
+		  <div>
+		    <ons-list>
+			  <ons-list-item class="itemo">
+			    <ons-row>
+			      <ons-col width="10%"><p>2</p></ons-col>
+			        <ons-col width="60%">
+					<span><p></p></span>
+                  </ons-col>
+                  <ons-col width="30%">
+                    <img ng-src="https://mb.api.cloud.nifty.com/2013-09-01/applications/uOmSwnvYwYbF1ekU/publicFiles/235fa81c2afa543d6c1d022f5abd84ed.jpg" class="item-thum2"></img>
+                  </ons-col>
+                </ons-row>
+              </ons-list-item>
+            </ons-list>
+          </div>
+        </span>
+      </div>
+      <div>
+        <ons-list-header>コツ・ポイント</ons-list-header>
+        <ons-list-item>
+          <p id="tips1"></p>
+        </ons-list-item>
+      </div>
+      <div>
+        <ons-list-header>このレシピの生い立ち</ons-list-header>
+        <ons-list-item>
+          <p id="oitati"></p>
+        </ons-list-item>
+        <ons-list-header>
+          <p id="idpage" style="text-align: center;"></p>
+        </ons-list-header>
+      </div>
+      </div>
+    </ons-page>
+  </ons-template>
+</body>
+</html>
